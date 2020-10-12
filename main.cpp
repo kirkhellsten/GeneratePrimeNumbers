@@ -50,13 +50,20 @@ vector<int> pf_generate_odd_prime_list(int pMaxOddNumberN) {
     return retPrimeList;
 }
 
+vector<int> pf_generate_prime_list(int pMaxOddNumberN) {
+    vector<int> oretPrimeList = pf_generate_odd_prime_list(pMaxOddNumberN);
+    // Only even prime number is 2, insert at beginning of vector list
+    oretPrimeList.insert(oretPrimeList.begin(), 2);
+    return oretPrimeList;
+}
+
 int main()
 {
-    map<int, bool> nonPrimeOddMap = pf_generate_odd_non_prime_map(100);
+    map<int, bool> nonPrimeOddMap = pf_generate_odd_non_prime_map(5000);
     for(map<int, bool>::iterator it = nonPrimeOddMap.begin(); it != nonPrimeOddMap.end(); ++it) {
         cout << it->first << " " << (it->second ? "Not Prime" : "Prime") << endl;
     }
-    vector<int> primeList = pf_generate_odd_prime_list(10000);
+    vector<int> primeList = pf_generate_prime_list(5000);
 
     cout << "Prime Number List: " << endl;
     for (int i = 0; i < primeList.size(); ++i) {
