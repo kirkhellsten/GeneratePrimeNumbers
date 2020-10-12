@@ -1,8 +1,12 @@
+#include <chrono>
+
 #include <iostream>
 
 #include <vector>
 #include <map>
 using namespace std;
+
+
 
 map<int, bool> pf_generate_odd_non_prime_map(int pMaxOddNumberN) {
 
@@ -57,8 +61,7 @@ vector<int> pf_generate_prime_list(int pMaxOddNumberN) {
     return oretPrimeList;
 }
 
-int main()
-{
+void print_prime_numbers() {
     map<int, bool> nonPrimeOddMap = pf_generate_odd_non_prime_map(5000);
     for(map<int, bool>::iterator it = nonPrimeOddMap.begin(); it != nonPrimeOddMap.end(); ++it) {
         cout << it->first << " " << (it->second ? "Not Prime" : "Prime") << endl;
@@ -72,6 +75,24 @@ int main()
         else
             cout << primeList[i];
     }
+}
 
+// https://stackoverflow.com/questions/2808398/easily-measure-elapsed-time
+void time_generation_of_prime_numbers() {
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    pf_generate_prime_list(10000);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+
+}
+
+int main()
+{
+
+    time_generation_of_prime_numbers();
     return 0;
 }
