@@ -94,8 +94,13 @@ vector<int> pf_generate_prime_list(int pMaxOddNumber) {
     return retPrimeList;
 }
 
-// Skipped starting number after 9, since all 9 + 6n have been flagged first
+// Skipped starting numbers
+// Created d and f lists, while doing this flag all 9 + 6n as composite, index set to i to skip this since already done
+// Change do while condition to true, moved condition to inner block
 vector<int> pf_generate_prime_list2(int pMaxOddNumber) {
+
+    vector<int> d = {};
+    vector<int> f = {};
 
     map<int, bool> oIsCompositeNumberList;
     int iFirstOddNumber = 3;
@@ -106,28 +111,36 @@ vector<int> pf_generate_prime_list2(int pMaxOddNumber) {
         oIsCompositeNumberList[c] = false;
     }
 
-
     int iNonPrimeOdd = 9;
     int iStartingNonPrimeOdd = 9;
     int iInitialDiff = 6;
     int iDiff = 6;
     int iDiffIncrement = 4;
 
+    int iDElement = iInitialDiff;
+
+    for (int c = iStartingNonPrimeOdd; c <= pMaxOddNumber; c += iInitialDiff) {
+        f.insert(f.end(), c);
+        d.insert(d.end(), iDElement);
+        iDElement += iDiffIncrement;
+        oIsCompositeNumberList[c] = true;
+    }
+
+    int i = 1;
+    iNonPrimeOdd = f[i];
+    iDiff = d[i];
+    int iSizeOfVectorContainers = f.size();
+
     do {
 
         if (iNonPrimeOdd > pMaxOddNumber) {
-
-            iStartingNonPrimeOdd += iInitialDiff;
-
-            if (iStartingNonPrimeOdd > pMaxOddNumber) break;
-
-            iDiff += iDiffIncrement;
-            iNonPrimeOdd = iStartingNonPrimeOdd + iDiff;
-
-        } else {
-            oIsCompositeNumberList[iNonPrimeOdd] = true;
-            iNonPrimeOdd += iDiff;
+            iDiff = d[i];
+            iNonPrimeOdd = f[i];
+            ++i;
+            if (i == iSizeOfVectorContainers) break;
         }
+        oIsCompositeNumberList[iNonPrimeOdd] = true;
+        iNonPrimeOdd += iDiff;
 
     } while(true);
 
