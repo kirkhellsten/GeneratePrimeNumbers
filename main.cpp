@@ -8,15 +8,17 @@ using namespace std;
 
 
 
-map<int, bool> pf_generate_odd_non_prime_map(int pMaxOddNumberN) {
+map<int, bool> pf_generate_odd_composite_map(int pMaxOddNumber) {
 
     map<int, bool> retNonPrimeOddNumberMap;
     int iFirstOddNumber = 3;
     int iSpaceBetweenOddNumber = 2;
 
-    for (int c = iFirstOddNumber; c < 3+(2*(pMaxOddNumberN-1)); c += iSpaceBetweenOddNumber) {
+
+    for (int c = iFirstOddNumber; c <= pMaxOddNumber; c += iSpaceBetweenOddNumber) {
         retNonPrimeOddNumberMap[c] = false;
     }
+
 
     int iNonPrimeOdd = 9;
     int iStartingNonPrimeOdd = 9;
@@ -40,13 +42,13 @@ map<int, bool> pf_generate_odd_non_prime_map(int pMaxOddNumberN) {
     return retNonPrimeOddNumberMap;
 }
 
-vector<int> pf_generate_odd_prime_list(int pMaxOddNumberN) {
+vector<int> pf_generate_prime_list(int pMaxNumber) {
 
-    map<int, bool> oddNonPrimeMap = pf_generate_odd_non_prime_map(pMaxOddNumberN);
-    vector<int> retPrimeList;
+    map<int, bool> oddNonPrimeMap = pf_generate_odd_composite_map(pMaxNumber % 2 == 0 ? pMaxNumber - 1 : pMaxNumber);
+    vector<int> retPrimeList = {2};
 
     for(map<int, bool>::iterator it = oddNonPrimeMap.begin(); it != oddNonPrimeMap.end(); ++it) {
-        if (it->second == 0) {
+        if (it->second == false) {
             retPrimeList.insert(retPrimeList.end(), it->first);
         }
     }
@@ -54,45 +56,80 @@ vector<int> pf_generate_odd_prime_list(int pMaxOddNumberN) {
     return retPrimeList;
 }
 
-vector<int> pf_generate_prime_list(int pMaxOddNumberN) {
-    vector<int> oretPrimeList = pf_generate_odd_prime_list(pMaxOddNumberN);
-    // Only even prime number is 2, insert at beginning of vector list
-    oretPrimeList.insert(oretPrimeList.begin(), 2);
-    return oretPrimeList;
+vector<int> pf_generate_prime_list_sieve_of_eratosthenes_method(int pMaxNumber) {
+    int pMinNumber = 2;
+    map<int, bool> oIsCompositeNumberList;
+    vector<int> retPrimeList;
+    oIsCompositeNumberList[pMinNumber] = false;
+    int iPrimeNumber = pMinNumber;
+    int iCompositeNumber = iPrimeNumber*2;
+    do {
+
+        if (iCompositeNumber > pMaxNumber) {
+            iPrimeNumber++;
+            if (iPrimeNumber > pMaxNumber) break;
+            // Check if iPrimeNumber is prime using composite number list
+            if (oIsCompositeNumberList[iPrimeNumber] == false) {
+                iCompositeNumber = iPrimeNumber*2;
+            }
+        } else {
+            oIsCompositeNumberList[iCompositeNumber] = true;
+            iCompositeNumber += iPrimeNumber;
+        }
+
+    } while(true);
+
+
+    for(map<int, bool>::iterator it = oIsCompositeNumberList.begin(); it != oIsCompositeNumberList.end(); ++it) {
+        if (it->second == false) {
+            retPrimeList.insert(retPrimeList.end(), it->first);
+        }
+    }
+
+    return retPrimeList;
 }
 
-void print_prime_numbers() {
-    map<int, bool> nonPrimeOddMap = pf_generate_odd_non_prime_map(5000);
-    for(map<int, bool>::iterator it = nonPrimeOddMap.begin(); it != nonPrimeOddMap.end(); ++it) {
-        cout << it->first << " " << (it->second ? "Not Prime" : "Prime") << endl;
-    }
-    vector<int> primeList = pf_generate_prime_list(5000);
-
+void print_prime_numbers(vector<int> oPrimeList) {
     cout << "Prime Number List: " << endl;
-    for (int i = 0; i < primeList.size(); ++i) {
-        if (i < primeList.size() - 1)
-            cout << primeList[i] << ",";
+    for (int i = 0; i < oPrimeList.size(); ++i) {
+        if (i < oPrimeList.size() - 1)
+            cout << oPrimeList[i] << ",";
         else
-            cout << primeList[i];
+            cout << oPrimeList[i];
     }
+    cout << endl;
 }
 
 // https://stackoverflow.com/questions/2808398/easily-measure-elapsed-time
 void time_generation_of_prime_numbers() {
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    pf_generate_prime_list(10000);
+    vector<int> oFirstPrimeList = pf_generate_prime_list(10000000);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
 
+    cout << "Number of Prime Numbers Found: " << oFirstPrimeList.size() << endl;
+    //print_prime_numbers(oFirstPrimeList);
+
+    begin = std::chrono::steady_clock::now();
+    vector<int> oSecondPrimeList = pf_generate_prime_list_sieve_of_eratosthenes_method(10000000);
+    end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+
+    cout << "Number of Prime Numbers Found: " << oSecondPrimeList.size() << endl;
+    //print_prime_numbers(oSecondPrimeList);
+
 }
 
 int main()
 {
-
+    //print_prime_numbers();
     time_generation_of_prime_numbers();
     return 0;
 }
